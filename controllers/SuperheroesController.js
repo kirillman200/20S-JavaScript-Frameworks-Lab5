@@ -9,11 +9,11 @@ exports.index = async (req, res) => {
 
 
   res.render(`${viewPath}/index`, {
-    pageTitle: 'Archive',
+    pageTitle: 'Known Registered Heroes',
     superhero: superhero
   });
   } catch (error) {
-    req.flash('danger', 'There was an issue fetching the superheroes list1');
+    req.flash('danger', 'There was an issue fetching the superheroes list');
     res.redirect('/');
   }
 }
@@ -27,21 +27,18 @@ exports.show = async (req, res) => {
       superhero: superhero
     })
   } catch (error) {
-    req.flash('danger', 'There was an issue fetching the superheroes list2');
+    req.flash('danger', 'There was an issue fetching the superheroes list');
     res.redirect('/');
   }
 };
 
 exports.new = (req, res) => {
-  try {
+
     res.render(`${viewPath}/new`, {
       pageTitle: 'New Superhero'
-    })
-  } catch (error) {
-    req.flash('danger', 'There was an issue fetching the superheroes list3');
-    res.redirect('/');
-  }
-};
+    
+  });
+}; 
 
 exports.create = async (req, res) => {
   try {
@@ -50,7 +47,7 @@ exports.create = async (req, res) => {
     req.flash('success', 'This hero was registered successfully');
     res.redirect(`/superheroes/${superhero.id}`);
   } catch (error) {
-    req.flash('danger', 'There was an issue fetching the superheroes list4');
+    req.flash('danger', 'There was an issue fetching the superheroes list');
     res.redirect('/');
   }
 };
@@ -61,10 +58,11 @@ exports.edit = async (req, res) => {
 
     res.render(`${viewPath}/edit`, {
       pageTitle: superhero.name,
+      pageTitle: superhero.alias, 
       formData: superhero
-    })
+    });
   } catch (error) {
-    req.flash('danger', 'There was an issue fetching the superheroes list5');
+    req.flash('danger', 'There was an issue fetching the superheroes list');
     res.redirect('/');
   }
 };
@@ -72,14 +70,28 @@ exports.edit = async (req, res) => {
 exports.update = async (req, res) => {
   try {
     let superhero = await Superhero.findById(req.body.id);
-    if (!superhero) throw new Error('Blog could not be found');
+    if (!superhero) throw new Error('Superhero could not be found');
+
     await Superhero.validate(req.body);
     await Superhero.updateOne(req.body);
+    
 
     req.flash('success', 'This hero was updated successfully');
     res.redirect(`/superheroes/${req.body.id}`);
   } catch (error) {
     req.flash('danger', 'There was an issue fetching the superheroes list6');
     res.redirect(`/superheroes/${req.body.id}/edit`);
+  }
+};
+
+exports.delete = async (req, res) => {
+  try {
+    console.log(req.body);
+    await Superhero.deleteOne({_id: req.body.id});
+    req.flash('success', 'The superhero was deleted successfully');
+    res.redirect(`/superheroes`);
+  } catch (error) {
+    req.flash('danger', `There was an error deleting this superhero: ${error}`);
+    res.redirect(`/superheroes`);
   }
 };
