@@ -57,8 +57,7 @@ exports.edit = async (req, res) => {
     const superhero = await Superhero.findById(req.params.id);
 
     res.render(`${viewPath}/edit`, {
-      pageTitle: superhero.name,
-      pageTitle: superhero.alias, 
+      pageTitle: superhero.name, 
       formData: superhero
     });
   } catch (error) {
@@ -71,9 +70,9 @@ exports.update = async (req, res) => {
   try {
     let superhero = await Superhero.findById(req.body.id);
     if (!superhero) throw new Error('Superhero could not be found');
-
+   
     await Superhero.validate(req.body);
-    await Superhero.updateOne(req.body);
+    await Superhero.findByIdAndUpdate({_id:req.body.id}, req.body);
     
 
     req.flash('success', 'This hero was updated successfully');
